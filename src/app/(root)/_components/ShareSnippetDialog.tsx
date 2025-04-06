@@ -4,6 +4,8 @@ import { useState } from "react";
 import { X } from "lucide-react";
 import toast from "react-hot-toast";
 import { api } from "../../../../convex/_generated/api";
+import { SignedIn, SignedOut } from "@clerk/nextjs";
+import LoginButton from "@/components/LoginButton";
 
 function ShareSnippetDialog({ onClose }: { onClose: () => void }) {
   const [title, setTitle] = useState("");
@@ -22,11 +24,11 @@ function ShareSnippetDialog({ onClose }: { onClose: () => void }) {
       onClose();
       setTitle("");
       toast.success("Snippet shared successfully.");
-    } 
+    }
     catch (error) {
       console.log("Error creating snippet:", error);
       toast.error("Error creating snippet.");
-    } 
+    }
     finally {
       setIsSharing(false);
     }
@@ -42,37 +44,53 @@ function ShareSnippetDialog({ onClose }: { onClose: () => void }) {
           </button>
         </div>
 
-        <form onSubmit={handleShare}>
-          <div className="mb-4">
-            <label htmlFor="title" className="block text-sm font-medium text-gray-400 mb-2">
-              Snippet Title
-            </label>
-            <input
-              type="text"
-              id="title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className="w-full px-3 py-2 bg-[#181825] border border-[#313244] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter a suitable title for your Snippet"
-              required
-            />
+        <SignedOut>
+          <div className="pt-4 flex justify-center  text-gray-400 mb-2">
+            <span>To share your Snippet, sign in to CodeStudio.</span>
+          </div>
+          <div className="mt-4 flex justify-center">
+            <LoginButton />
           </div>
 
-          <div className="flex justify-end gap-3">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 text-gray-400 hover:text-gray-300">
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={isSharing}
-              className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50">
-              {isSharing ? "Sharing..." : "Share"}
-            </button>
-          </div>
-        </form>
+        </SignedOut>
+
+        <SignedIn>
+          <form onSubmit={handleShare}>
+            <div className="mb-4">
+              <label htmlFor="title" className="block text-sm font-medium text-gray-400 mb-2">
+                Snippet Title
+              </label>
+              <input
+                type="text"
+                id="title"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                className="w-full px-3 py-2 bg-[#181825] border border-[#313244] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter a suitable title for your Snippet"
+                required
+              />
+            </div>
+
+            <div className="flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={onClose}
+                className="px-4 py-2 text-gray-400 hover:text-gray-300">
+                Cancel
+              </button>
+
+
+              <button
+                type="submit"
+                disabled={isSharing}
+                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50">
+                {isSharing ? "Sharing..." : "Share"}
+              </button>
+
+
+            </div>
+          </form>
+        </SignedIn>
       </div>
     </div>
   );
